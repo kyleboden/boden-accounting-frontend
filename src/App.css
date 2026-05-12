@@ -1,0 +1,46 @@
+.footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 50px;
+    background-color: black;
+    text-align: center;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Page layout to support a proper sticky footer without overlapping content */
+html, body, #root {
+    height: 100%;
+    margin: 0;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.app-content {
+    flex: 1 0 auto; /* main content grows to fill available space */
+    /* ensure content isn't hidden behind the fixed footer */
+    padding-bottom: 60px; /* slightly larger than footer height */
+}
+
+/* delta styling for totals comparison */
+.delta {
+    margin-left: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.delta-positive {
+    color: #198754; /* bootstrap success */
+}
+.delta-negative {
+    color: #dc3545; /* bootstrap danger */
+}
+.delta-zero {
+    color: #6c757d; /* muted */
+}
