@@ -88,7 +88,6 @@ const ListBrokerageTransactionsComponent = () => {
             const amount = Math.abs(Number(tx.amount ?? 0))
             const isWithdrawal = String(tx.type ?? '').toUpperCase().includes('WITHDRAW') || (Number(tx.amount) < 0)
 
-
             if (isWithdrawal) {
                 // Withdrawals reduce tithed first, then investments
                 const takeFromTithed = Math.min(tithed, amount)
