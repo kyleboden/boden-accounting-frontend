@@ -17,7 +17,6 @@ const MonthlyReviewComponent = () => {
     const [totalBank, setTotalBank] = useState(() => String(initialReview?.totalBank ?? ''))
     const [totalBrokerage, setTotalBrokerage] = useState(() => String(initialReview?.totalBrokerage ?? ''))
     const [tithingPaid, setTithingPaid] = useState(() => String(initialReview?.tithingPaid ?? ''))
-    const [investedTithed, setInvestedTithed] = useState(() => String(initialReview?.investedTithed ?? ''))
     const [investedNontithed, setInvestedNontithed] = useState(() => String(initialReview?.investedNontithed ?? ''))
     const [date, setDate] = useState(() => initialReview?.date ?? new Date().toISOString().substring(0, 10))
     const [notes, setNotes] = useState(() => initialReview?.notes ?? '')
@@ -38,7 +37,6 @@ const MonthlyReviewComponent = () => {
             setTotalBank(String(review.totalBank ?? ''))
             setTotalBrokerage(String(review.totalBrokerage ?? ''))
             setTithingPaid(String(review.tithingPaid ?? ''))
-            setInvestedTithed(String(review.investedTithed ?? ''))
             setInvestedNontithed(String(review.investedNontithed ?? ''))
             setDate(review.date ?? '')
             setNotes(review.notes ?? '')
@@ -89,7 +87,6 @@ const MonthlyReviewComponent = () => {
             totalBank: Number(totalBank),
             totalBrokerage: Number(totalBrokerage),
             tithingPaid: tithingPaid === '' ? null : Number(tithingPaid),
-            investedTithed: investedTithed === '' ? null : Number(investedTithed),
             investedNontithed: investedNontithed === '' ? null : Number(investedNontithed),
             date,
             notes

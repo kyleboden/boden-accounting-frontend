@@ -60,8 +60,7 @@ const ListMonthlyReviewComponent = () => {
             return
         }
         console.log(id);
-        deleteMonthlyReview(id).then((response) => {
-            console.log(response.data);
+        deleteMonthlyReview(id).then(() => {
             getAllMonthlyReviews();
         }).catch(error => {
             console.error(error);
@@ -91,7 +90,6 @@ const ListMonthlyReviewComponent = () => {
                 {monthlyReviews.map((review) => {
                     const totalIncome = Number(review.kyleIncome ?? 0) + Number(review.sarahIncome ?? 0) + Number(review.giftCardIncome ?? 0)
                     const totalWithdrawal = Number(review.hsaWithdrawal ?? 0) + Number(review.brokerageWithdrawal ?? 0)
-                    const totalInvested = Number(review.investedTithed ?? 0) + Number(review.investedNontithed ?? 0)
 
                     return (
                         <tr key={review.id}>
@@ -101,7 +99,7 @@ const ListMonthlyReviewComponent = () => {
                             <td>{formatCurrency(review.totalBank ?? 0)}</td>
                             <td>{formatCurrency(review.totalBrokerage ?? 0)}</td>
                             <td>{formatCurrency(review.tithingPaid ?? 0)}</td>
-                            <td>{formatCurrency(totalInvested)}</td>
+                            <td>{formatCurrency(review.investedNontithed ?? 0)}</td>
                             <td>{review.notes}</td>
                             <td>
                                 <button className='btn btn-info' onClick={() => updateMonthlyReviewEntry(review)}>Update</button>
