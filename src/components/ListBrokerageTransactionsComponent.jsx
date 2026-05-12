@@ -119,37 +119,7 @@ const ListBrokerageTransactionsComponent = () => {
 
     function removeTransaction(id) {
         if (!window.confirm('Are you sure you want to delete this brokerage transaction?')) return
-        // find the transaction locally so we can update totals optimistically
-        const tx = transactions.find((t) => t.id === id)
-
-        // if we don't have the transaction locally, fall back to server refresh after delete
-        if (!tx) {
-            deleteBrokerageTransaction(id)
-                .then(() => {
-                    getAllTransactions()
-                    getAllBrokerageTotals()
-                })
-                .catch((error) => console.error(error))
-            return
-        }
-
-
-        // Optimistically remove the transaction from the UI; totals are derived
-        // from monthly reviews (totalInAccount) and cumulative transactions.
-        setTransactions((prev) => prev.filter((t) => t.id !== id))
-
-
-        // perform server delete; on failure revert by reloading from server
-        deleteBrokerageTransaction(id)
-            .then(() => {
-                // successful on server; nothing else to do (UI already updated)
-            })
-            .catch((error) => {
-                console.error(error)
-                // revert to authoritative server state
-                getAllTransactions()
-                getAllBrokerageTotals()
-            })
+        deleteBrokerageTransaction(id).then(() => getAllTransactions()).catch((error) => console.error(error))
     }
 
     // Simplified: we expect dates in YYYY-MM-DD (e.g. 2026-04-25).

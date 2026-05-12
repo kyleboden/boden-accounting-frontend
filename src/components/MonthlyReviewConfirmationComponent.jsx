@@ -123,29 +123,9 @@ const MonthlyReviewConfirmationComponent = () => {
             // response.data is the saved monthly review (backend may return it)
             const savedMonthly = response.data || payload
 
-            // Use the first day of the next month for the brokerage transaction date
-            // backend expects LocalDate like 'YYYY-MM-DD'
-            function firstDayOfNextMonth(dateStr) {
-                try {
-                    const base = dateStr ? new Date(`${dateStr}T00:00:00`) : new Date()
-                    // move to first of next month
-                    const y = base.getFullYear()
-                    const m = base.getMonth()
-                    const next = new Date(Date.UTC(y, m + 1, 1))
-                    const yyyy = next.getUTCFullYear()
-                    const mm = String(next.getUTCMonth() + 1).padStart(2, '0')
-                    const dd = '01'
-                    return `${yyyy}-${mm}-${dd}`
-                } catch {
-                    // fallback to provided date or original monthly review date
-                    return dateStr || monthlyReview.date || ''
-                }
-            }
-
-            const brokerageDate = firstDayOfNextMonth(savedMonthly.date || monthlyReview.date)
-
             const brokerageDto = {
-                date: brokerageDate,
+                // backend expects LocalDate like 'YYYY-MM-DD'
+                date: savedMonthly.date || monthlyReview.date,
                 type: TRANSACTION_TYPE,
                 amount: Number(confirmedInvestment),
                 tithed: false,

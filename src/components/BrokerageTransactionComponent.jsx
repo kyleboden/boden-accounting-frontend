@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { createBrokerageTransaction, getBrokerageTransaction, updateBrokerageTransaction, listBrokerageTransactions } from '../services/BrokerageTransactionService.js'
+import { createBrokerageTransaction, getBrokerageTransaction, updateBrokerageTransaction } from '../services/BrokerageTransactionService.js'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 const BrokerageTransactionComponent = () => {
@@ -25,17 +25,6 @@ const BrokerageTransactionComponent = () => {
             setAmount(String(tx.amount ?? ''))
             setTithed(Boolean(tx.tithed ?? false))
             setNotes(tx.notes ?? '')
-            // ensure only latest-month transactions are editable
-            listBrokerageTransactions().then((listRes) => {
-                const items = Array.isArray(listRes.data) ? listRes.data.slice() : []
-                items.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
-                const latest = items[0]?.date ? items[0].date.substring(0,7) : null
-                const txMonth = tx.date ? tx.date.substring(0,7) : null
-                if (latest && txMonth && latest !== txMonth) {
-                    window.alert('Editing historical transactions is disabled. You can only edit transactions in the most recent month.')
-                    navigator('/brokerage-transactions')
-                }
-            }).catch(() => {/* ignore */})
         }).catch((error) => {
             console.error(error)
         })
@@ -57,35 +46,20 @@ const BrokerageTransactionComponent = () => {
 
         if (!validateForm()) return
 
-        // enforce only latest-month edits/creates (allow create if no transactions exist yet)
-        listBrokerageTransactions().then((listRes) => {
-            const items = Array.isArray(listRes.data) ? listRes.data.slice() : []
-            items.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
-            const latest = items[0]?.date ? items[0].date.substring(0,7) : null
-            const payloadMonth = date ? date.substring(0,7) : null
-            const allowCreateWhenEmpty = items.length === 0
-            // if (latest && payloadMonth && payloadMonth !== latest && !allowCreateWhenEmpty) {
-            //     window.alert('You can only create or edit transactions in the most recent month.')
-            //     return
-            // }
+        const payload = {
+            date,
+            type,
+            amount: Number(amount),
+            tithed,
+            notes
+        }
 
-            const payload = {
-                date,
-                type,
-                amount: Number(amount),
-                tithed,
-                notes
-            }
+        const request = id ? updateBrokerageTransaction(id, payload) : createBrokerageTransaction(payload)
 
-            const request = id ? updateBrokerageTransaction(id, payload) : createBrokerageTransaction(payload)
-
-            request.then(() => {
-                navigator('/brokerage-transactions')
-            }).catch((error) => {
-                console.error(error)
-            })
-        }).catch((err) => {
-            console.error('Failed to validate latest month', err)
+        request.then(() => {
+            navigator('/brokerage-transactions')
+        }).catch((error) => {
+            console.error(error)
         })
     }
 
