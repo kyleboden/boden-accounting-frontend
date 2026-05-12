@@ -59,9 +59,6 @@ const ListBrokerageTransactionsComponent = () => {
     }, [])
 
 
-    // derive latest month (YYYY-MM) from loaded transactions (list is sorted newest-first)
-    const latestMonth = transactions[0]?.date ? transactions[0].date.substring(0,7) : null
-
     // We'll compute cumulative tithed / non-tithed balances up to each month
     // using plain numbers (dollars) for simplicity per user request.
     const toNumber = (v) => Number(v ?? 0)
@@ -298,21 +295,17 @@ const ListBrokerageTransactionsComponent = () => {
 
             <table className='table table-striped table-bordered'>
                 <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Tithed</th>
-                    <th>Notes</th>
-                    <th>Actions</th>
-                </tr>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Tithed</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {transactions.map((tx) => {
-                    const txMonth = tx.date ? tx.date.substring(0,7) : null
-                    const isEditable = latestMonth && txMonth === latestMonth
-
-                    return (
+                    {transactions.map((tx) => (
                         <tr key={tx.id}>
                             <td>{formatDayMonthYear(tx.date)}</td>
                             <td>{tx.type}</td>
@@ -320,12 +313,11 @@ const ListBrokerageTransactionsComponent = () => {
                             <td>{tx.tithed ? 'Yes' : 'No'}</td>
                             <td>{tx.notes}</td>
                             <td>
-                                <button className='btn btn-info' onClick={() => updateTransactionEntry(tx)} disabled={!isEditable}>Update</button>
-                                <button className='btn btn-danger' style={{ marginLeft: '10px' }} onClick={() => removeTransaction(tx.id)} disabled={!isEditable}>Delete</button>
+                                <button className='btn btn-info' onClick={() => updateTransactionEntry(tx)}>Update</button>
+                                <button className='btn btn-danger' style={{ marginLeft: '10px' }} onClick={() => removeTransaction(tx.id)}>Delete</button>
                             </td>
                         </tr>
-                    )
-                })}
+                    ))}
                 </tbody>
             </table>
         </div>

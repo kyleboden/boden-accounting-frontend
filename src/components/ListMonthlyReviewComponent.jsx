@@ -47,9 +47,6 @@ const ListMonthlyReviewComponent = () => {
         getAllMonthlyReviews();
     }, [])
 
-    // derive latest month (YYYY-MM) from loaded reviews (list is sorted newest-first)
-    const latestMonth = monthlyReviews[0]?.date ? monthlyReviews[0].date.substring(0,7) : null
-
     function addNewMonthlyReview(){
         navigator('/add-monthly-review')
     }
@@ -96,9 +93,6 @@ const ListMonthlyReviewComponent = () => {
                     const totalWithdrawal = Number(review.hsaWithdrawal ?? 0) + Number(review.brokerageWithdrawal ?? 0)
                     const totalInvested = Number(review.investedTithed ?? 0) + Number(review.investedNontithed ?? 0)
 
-                    const thisMonth = review.date ? review.date.substring(0,7) : null
-                    const isEditable = latestMonth && thisMonth === latestMonth
-
                     return (
                         <tr key={review.id}>
                             <td>{formatMonthYear(review.date)}</td>
@@ -110,8 +104,8 @@ const ListMonthlyReviewComponent = () => {
                             <td>{formatCurrency(totalInvested)}</td>
                             <td>{review.notes}</td>
                             <td>
-                                <button className='btn btn-info' onClick={() => updateMonthlyReviewEntry(review)} disabled={!isEditable}>Update</button>
-                                <button className='btn btn-danger' onClick={() => removeMonthlyReview(review.id)} style={{marginLeft: '10px'}} disabled={!isEditable}>Delete</button>
+                                <button className='btn btn-info' onClick={() => updateMonthlyReviewEntry(review)}>Update</button>
+                                <button className='btn btn-danger' onClick={() => removeMonthlyReview(review.id)} style={{marginLeft: '10px'}}>Delete</button>
                             </td>
                         </tr>
                     )
