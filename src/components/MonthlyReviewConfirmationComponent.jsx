@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { createMonthlyReview, updateMonthlyReview } from '../services/MonthlyReviewService.js'
-import { createBrokerageTransaction, updateBrokerageTransaction } from '../services/BrokerageTransactionService.js'
 import { formatCurrency } from '../utils/formatCurrency.js'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -11,7 +10,6 @@ const MonthlyReviewConfirmationComponent = () => {
     const id = state?.id
     const monthlyReview = state?.monthlyReview
     const MIN_BANK_AMOUNT = 12000
-    const TRANSACTION_TYPE = 'DEPOSIT'
 
     const calculations = useMemo(() => {
         if (!monthlyReview) {
@@ -117,32 +115,10 @@ const MonthlyReviewConfirmationComponent = () => {
             ? updateMonthlyReview(id, payload)
             : createMonthlyReview(payload)
 
-        // After the monthly review is saved, create/update a brokerage transaction to record the investment.
-        request.then((response) => {
-            // response.data is the saved monthly review (backend may return it)
-            const savedMonthly = response.data || payload
-
-            const brokerageDto = {
-                // backend expects LocalDate like 'YYYY-MM-DD'
-                date: savedMonthly.date || monthlyReview.date,
-                type: TRANSACTION_TYPE,
-                amount: Number(confirmedInvestment),
-                tithed: false,
-                notes: `From monthly review ${savedMonthly.date || monthlyReview.date}: ` + (savedMonthly.notes || '')
-            }
-
-            // If the draft included a brokerageTransactionId, update that transaction; otherwise create a new one.
-            const brokerageRequest = savedMonthly.brokerageTransactionId
-                ? updateBrokerageTransaction(savedMonthly.brokerageTransactionId, brokerageDto)
-                : createBrokerageTransaction(brokerageDto)
-
-            return brokerageRequest
-        }).then(() => {
+        request.then(() => {
             navigator('/monthly-reviews')
         }).catch((error) => {
-            console.error('Error saving monthly review or brokerage transaction', error)
-            // still navigate back but log the error — change behavior if you prefer stricter failure handling
-            navigator('/monthly-reviews')
+            console.error(error)
         })
     }
 
