@@ -44,3 +44,71 @@ body {
 .delta-zero {
     color: #6c757d; /* muted */
 }
+
+.brokerage-chart-controls {
+    width: min(100%, 320px);
+}
+
+.brokerage-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    margin-bottom: 12px;
+}
+
+.brokerage-chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.brokerage-chart-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+}
+
+.brokerage-chart-shell {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.brokerage-chart-svg {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+}
+
+.brokerage-chart-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.brokerage-chart-metric {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fff;
+}
+
+.brokerage-chart-metric-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.brokerage-chart-metric-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #212529;
+    overflow-wrap: anywhere;
+}

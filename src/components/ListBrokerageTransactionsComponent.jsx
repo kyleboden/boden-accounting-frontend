@@ -3,6 +3,7 @@ import { listBrokerageTransactions, deleteBrokerageTransaction } from '../servic
 import { useNavigate } from 'react-router-dom'
 import { listMonthlyReviews } from '../services/MonthlyReviewService.js'
 import BrokerageBalanceSummaryComponent from './BrokerageBalanceSummaryComponent.jsx'
+import BrokerageHistoryChartComponent from './BrokerageHistoryChartComponent.jsx'
 import BrokerageTotalsTableComponent from './BrokerageTotalsTableComponent.jsx'
 import BrokerageTransactionsTableComponent from './BrokerageTransactionsTableComponent.jsx'
 
@@ -108,6 +109,52 @@ const ListBrokerageTransactionsComponent = () => {
         return { tithed, invest }
     }
 
+    function buildMonthlyTransactionActivity() {
+        const activityByMonth = new Map()
+        let tithed = 0
+        let invest = 0
+
+        for (const tx of txsAsc) {
+            if (!tx.date) continue
+
+            const monthKey = tx.date.substring(0, 7)
+            const current = activityByMonth.get(monthKey) ?? {
+                monthlyTithedNet: 0,
+                monthlyNonTithedNet: 0,
+                monthlyNetContribution: 0,
+                monthlyWithdrawals: 0
+            }
+
+            const amount = Math.abs(Number(tx.amount ?? 0))
+            const isWithdrawal = String(tx.type ?? '').toUpperCase().includes('WITHDRAW') || (Number(tx.amount) < 0)
+
+            if (isWithdrawal) {
+                const takeFromTithed = Math.min(tithed, amount)
+                tithed -= takeFromTithed
+                const remaining = amount - takeFromTithed
+                const takeFromInvest = Math.min(invest, remaining)
+                invest = Math.max(0, invest - remaining)
+
+                current.monthlyTithedNet -= takeFromTithed
+                current.monthlyNonTithedNet -= takeFromInvest
+                current.monthlyNetContribution -= amount
+                current.monthlyWithdrawals += amount
+            } else if (tx.tithed) {
+                tithed += amount
+                current.monthlyTithedNet += amount
+                current.monthlyNetContribution += amount
+            } else {
+                invest += amount
+                current.monthlyNonTithedNet += amount
+                current.monthlyNetContribution += amount
+            }
+
+            activityByMonth.set(monthKey, current)
+        }
+
+        return activityByMonth
+    }
+
     function addNewTransaction() {
         navigator('/add-brokerage-transaction')
     }
@@ -172,6 +219,39 @@ const ListBrokerageTransactionsComponent = () => {
     const preTithe = grossBalance - alreadyTithed
     const suggestedTithing = Math.ceil(Math.max(0, preTithe) * 0.1)
     const postTithingBalance = grossBalance - suggestedTithing
+    const monthlyActivity = buildMonthlyTransactionActivity()
+    const brokerageTotalsAsc = [...brokerageTotals].sort((a, b) => {
+        const da = a.date ?? ''
+        const db = b.date ?? ''
+        if (da < db) return -1
+        if (da > db) return 1
+        return 0
+    })
+    const monthlyChartData = brokerageTotalsAsc.map((total, idx) => {
+        const monthKey = total.date ? String(total.date).substring(0, 7) : null
+        const totalBrokerage = Number(total.totalBrokerage ?? total.totalInAccount ?? 0)
+        const { tithed, invest } = monthKey ? computeBalancesUpToMonth(monthKey) : { tithed: 0, invest: 0 }
+        const interest = totalBrokerage - (tithed + invest)
+        const previous = idx > 0 ? brokerageTotalsAsc[idx - 1] : null
+        const previousMonthKey = previous?.date ? String(previous.date).substring(0, 7) : null
+        const previousTotalBrokerage = previous ? Number(previous.totalBrokerage ?? previous.totalInAccount ?? 0) : 0
+        const previousBalances = previousMonthKey ? computeBalancesUpToMonth(previousMonthKey) : { tithed: 0, invest: 0 }
+        const previousInterest = previous ? (previousTotalBrokerage - (previousBalances.tithed + previousBalances.invest)) : 0
+        const monthlyValues = monthKey ? (monthlyActivity.get(monthKey) ?? {}) : {}
+
+        return {
+            monthKey,
+            totalBrokerage,
+            tithed,
+            nonTithed: invest,
+            interest,
+            monthlyTithedNet: Number(monthlyValues.monthlyTithedNet ?? 0),
+            monthlyNonTithedNet: Number(monthlyValues.monthlyNonTithedNet ?? 0),
+            monthlyNetContribution: Number(monthlyValues.monthlyNetContribution ?? 0),
+            monthlyBalanceChange: idx > 0 ? totalBrokerage - previousTotalBrokerage : totalBrokerage,
+            monthlyInterestChange: idx > 0 ? interest - previousInterest : interest
+        }
+    })
 
     return (
         <div className='container'>
@@ -181,6 +261,8 @@ const ListBrokerageTransactionsComponent = () => {
                 alreadyTithed={alreadyTithed}
                 preTithe={preTithe}
             />
+
+            <BrokerageHistoryChartComponent monthlyData={monthlyChartData} />
 
             <BrokerageTotalsTableComponent
                 brokerageTotals={brokerageTotals}
