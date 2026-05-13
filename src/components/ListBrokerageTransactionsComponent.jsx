@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { listBrokerageTransactions, deleteBrokerageTransaction } from '../services/BrokerageTransactionService.js'
 import { useNavigate } from 'react-router-dom'
-import { formatCurrency } from '../utils/formatCurrency.js'
 import { listMonthlyReviews } from '../services/MonthlyReviewService.js'
+import BrokerageBalanceSummaryComponent from './BrokerageBalanceSummaryComponent.jsx'
+import BrokerageTotalsTableComponent from './BrokerageTotalsTableComponent.jsx'
+import BrokerageTransactionsTableComponent from './BrokerageTransactionsTableComponent.jsx'
 
 const ListBrokerageTransactionsComponent = () => {
     const [transactions, setTransactions] = useState([])
@@ -173,156 +175,29 @@ const ListBrokerageTransactionsComponent = () => {
 
     return (
         <div className='container'>
-            {/* Top summary */}
-            <div className='row mb-3 mt-3'>
-                <div className='col-md-6'>
-                    <div className='card p-3'>
-                        <div className='small text-muted'>Gross Balance</div>
-                        <div style={{ fontSize: '2rem', fontWeight: 700 }}>{formatCurrency(grossBalance)}</div>
-                    </div>
-                </div>
-                <div className='col-md-6'>
-                    <div className='card p-3'>
-                        <div className='small text-muted'>Post-Tithing Balance</div>
-                        <div style={{ fontSize: '2rem', fontWeight: 700 }}>{formatCurrency(postTithingBalance)}</div>
-                    </div>
-                </div>
-            </div>
+            <BrokerageBalanceSummaryComponent
+                grossBalance={grossBalance}
+                postTithingBalance={postTithingBalance}
+                alreadyTithed={alreadyTithed}
+                preTithe={preTithe}
+            />
 
-            {/* Balance breakdown bar */}
-            <div className='card mb-4 p-3'>
-                <div className='mb-2 small text-muted'>Balance Breakdown</div>
-                <div style={{ display: 'flex', height: '40px', width: '100%', borderRadius: '4px', overflow: 'hidden' }}>
-                    {grossBalance > 0 ? (
-                        <>
-                            <div style={{ backgroundColor: '#00b050', width: `${(alreadyTithed / grossBalance) * 100}%`, minWidth: '1px' }} title={`Already Tithed: ${formatCurrency(alreadyTithed)}`} />
-                            <div style={{ backgroundColor: '#f0ad4e', width: `${(preTithe / grossBalance) * 100}%`, minWidth: '1px' }} title={`Pre-Tithe: ${formatCurrency(preTithe)}`} />
-                        </>
-                    ) : (
-                        <div style={{ backgroundColor: '#e9ecef', width: '100%' }} />
-                    )}
-                </div>
-                <div className='mt-2 d-flex gap-3 align-items-center'>
-                    <div className='d-flex align-items-center'>
-                        <div style={{ width: '16px', height: '12px', backgroundColor: '#00b050', marginRight: '8px' }}></div>
-                        <div>Already Tithed: {formatCurrency(alreadyTithed)}</div>
-                    </div>
-                    <div className='d-flex align-items-center'>
-                        <div style={{ width: '16px', height: '12px', backgroundColor: '#f0ad4e', marginRight: '8px' }}></div>
-                        <div>Pre-Tithe: {formatCurrency(preTithe)}</div>
-                    </div>
-                </div>
-            </div>
+            <BrokerageTotalsTableComponent
+                brokerageTotals={brokerageTotals}
+                computeBalancesUpToMonth={computeBalancesUpToMonth}
+                formatDayMonthYear={formatDayMonthYear}
+                lastDayOfMonthIso={lastDayOfMonthIso}
+            />
 
-            {/* Brokerage Totals */}
-            <h2 className='text-center'>Brokerage Totals</h2>
-
-            <table className='table table-striped table-bordered'>
-                <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Total In Brokerage</th>
-                    <th>Total Tithed</th>
-                    <th>Non-Tithed Investments</th>
-                    <th>Interest Growth</th>
-                </tr>
-                </thead>
-                <tbody>
-                {brokerageTotals.map((total, idx) => {
-                    // authoritative total in brokerage (from monthly review)
-                    // monthly reviews may expose this value under different property names
-                    // (e.g. totalBrokerage or totalInAccount). Accept either.
-                    const totalInValue = (total.totalBrokerage ?? total.totalInAccount ?? 0)
-                    const totalIn = Number(totalInValue ?? 0)
-
-                    // month key for this totals row (YYYY-MM)
-                    const monthKey = total.date ? String(total.date).substring(0,7) : null
-
-                    // compute cumulative balances up to this month (tithed + investments)
-                    const { tithed, invest } = monthKey ? computeBalancesUpToMonth(monthKey) : { tithed: 0, invest: 0 }
-
-                    const interest = totalIn - (tithed + invest)
-                    const interestPercent = (totalIn && !Number.isNaN(totalIn)) ? (interest / totalIn) * 100 : null
-
-                    // previous month (older)
-                    const prev = brokerageTotals[idx + 1]
-                    const prevInValue = prev ? (prev.totalBrokerage ?? prev.totalInAccount ?? 0) : null
-                    const prevIn = prevInValue !== null ? Number(prevInValue) : null
-                    const prevMonthKey = prev && prev.date ? String(prev.date).substring(0,7) : null
-                    const prevBalances = prevMonthKey ? computeBalancesUpToMonth(prevMonthKey) : null
-                    const prevTithed = prevBalances ? prevBalances.tithed : null
-                    const prevInvest = prevBalances ? prevBalances.invest : null
-                    const prevInterest = (prevIn !== null && prevTithed !== null && prevInvest !== null) ? (prevIn - (prevTithed + prevInvest)) : null
-
-                    function renderDelta(current, previous) {
-                        if (previous === null || previous === undefined) return null
-                        const delta = current - previous
-                        if (delta === 0) {
-                            return <small className="delta delta-zero">({delta >= 0 ? '+' : '-'}{formatCurrency(Math.abs(delta))})</small>
-                        }
-                        const cls = delta > 0 ? 'delta-positive' : 'delta-negative'
-                        return <small className={`delta ${cls}`}>({delta > 0 ? '+' : '-'}{formatCurrency(Math.abs(delta))})</small>
-                    }
-
-                    function renderPercent(pct) {
-                        if (pct === null || pct === undefined || Number.isNaN(pct)) return null
-                        const sign = pct > 0 ? '' : '-'
-                        return <small className="text-muted"> ({sign}{Math.abs(pct).toFixed(2)}%)</small>
-                    }
-
-                    const displayDateIso = lastDayOfMonthIso(total.date)
-
-                    return (
-                        <tr key={total.id}>
-                            <td>{formatDayMonthYear(displayDateIso)}</td>
-                            <td>{formatCurrency(totalIn)} {renderDelta(totalIn, prevIn)}</td>
-                            <td>{formatCurrency(tithed)} {renderDelta(tithed, prevTithed)}</td>
-                            <td>{formatCurrency(invest)} {renderDelta(invest, prevInvest)}</td>
-                            <td>{formatCurrency(interest)} {renderDelta(interest, prevInterest)} {renderPercent(interestPercent)}</td>
-                        </tr>
-                    )
-                })}
-                </tbody>
-            </table>
-
-            <hr />
-
-            {/* Brokerage Transactions */}
-            <h2 className='text-center'>Brokerage Transactions</h2>
-            <div className='mb-2'>
-                <button className='btn btn-primary' onClick={addNewTransaction}>Add Transaction</button>
-            </div>
-
-            <table className='table table-striped table-bordered'>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Amount</th>
-                        <th>Tithed</th>
-                        <th>Notes</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {transactions.map((tx) => (
-                        <tr key={tx.id}>
-                            <td>{formatDayMonthYear(tx.date)}</td>
-                            <td>{tx.type}</td>
-                            <td>{formatCurrency(tx.amount ?? 0)}</td>
-                            <td>{tx.tithed ? 'Yes' : 'No'}</td>
-                            <td>{tx.notes}</td>
-                            <td>
-                                <button className='btn btn-info' onClick={() => updateTransactionEntry(tx)}>Update</button>
-                                <button className='btn btn-danger' style={{ marginLeft: '10px' }} onClick={() => removeTransaction(tx.id)}>Delete</button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <BrokerageTransactionsTableComponent
+                transactions={transactions}
+                formatDayMonthYear={formatDayMonthYear}
+                onAddTransaction={addNewTransaction}
+                onUpdateTransaction={updateTransactionEntry}
+                onDeleteTransaction={removeTransaction}
+            />
         </div>
     )
 }
 
 export default ListBrokerageTransactionsComponent
-
