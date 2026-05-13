@@ -99,7 +99,7 @@ const ListMonthlyReviewComponent = () => {
                             <td>{formatCurrency(review.totalBank ?? 0)}</td>
                             <td>{formatCurrency(review.totalBrokerage ?? 0)}</td>
                             <td>{formatCurrency(review.tithingPaid ?? 0)}</td>
-                            <td>{formatCurrency(review.investedNontithed ?? 0)}</td>
+                            <td>{formatCurrency(review.investedNonTithed ?? 0)}</td>
                             <td>{review.notes}</td>
                             <td>
                                 <button className='btn btn-info' onClick={() => updateMonthlyReviewEntry(review)}>Update</button>

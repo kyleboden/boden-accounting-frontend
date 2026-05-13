@@ -54,8 +54,8 @@ const MonthlyReviewConfirmationComponent = () => {
             return ''
         }
 
-        if (monthlyReview.investedNontithed !== null && monthlyReview.investedNontithed !== undefined) {
-            return String(monthlyReview.investedNontithed)
+        if (monthlyReview.investedNonTithed !== null && monthlyReview.investedNonTithed !== undefined) {
+            return String(monthlyReview.investedNonTithed)
         }
 
         return String(calculations.suggestedInvestment)
@@ -108,7 +108,7 @@ const MonthlyReviewConfirmationComponent = () => {
         const payload = {
             ...monthlyReview,
             tithingPaid: Number(confirmedTithing),
-            investedNontithed: Number(confirmedInvestment)
+            investedNonTithed: Number(confirmedInvestment)
         }
 
         const request = id
