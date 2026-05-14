@@ -6,6 +6,7 @@ import BrokerageBalanceSummaryComponent from './BrokerageBalanceSummaryComponent
 import BrokerageHistoryChartComponent from './BrokerageHistoryChartComponent.jsx'
 import BrokerageTotalsTableComponent from './BrokerageTotalsTableComponent.jsx'
 import BrokerageTransactionsTableComponent from './BrokerageTransactionsTableComponent.jsx'
+import BrokerageGoalCalculatorComponent from './BrokerageGoalCalculatorComponent.jsx'
 
 const ListBrokerageTransactionsComponent = () => {
     const [transactions, setTransactions] = useState([])
@@ -216,7 +217,9 @@ const ListBrokerageTransactionsComponent = () => {
     const latestBalances = latestMonthKey ? computeBalancesUpToMonth(latestMonthKey) : { tithed: 0, invest: 0 }
     const grossBalance = latestIn
     const alreadyTithed = latestBalances.tithed
-    const preTithe = grossBalance - alreadyTithed
+    const nonTithedInvestments = latestBalances.invest
+    const interest = Math.max(0, grossBalance - alreadyTithed - nonTithedInvestments)
+    const preTithe = nonTithedInvestments + interest
     const suggestedTithing = Math.ceil(Math.max(0, preTithe) * 0.1)
     const postTithingBalance = grossBalance - suggestedTithing
     const monthlyActivity = buildMonthlyTransactionActivity()
@@ -252,6 +255,19 @@ const ListBrokerageTransactionsComponent = () => {
             monthlyInterestChange: idx > 0 ? interest - previousInterest : interest
         }
     })
+    const averageMonthlySavingsLastSixMonths = (() => {
+        const latestSixMonthlyChanges = monthlyChartData.slice(-6)
+
+        if (latestSixMonthlyChanges.length === 0) {
+            return 0
+        }
+
+        const sum = latestSixMonthlyChanges.reduce((total, month) => (
+            total + Number(month.monthlyBalanceChange ?? 0)
+        ), 0)
+
+        return Math.max(0, sum / latestSixMonthlyChanges.length)
+    })()
 
     return (
         <div className='container'>
@@ -259,7 +275,14 @@ const ListBrokerageTransactionsComponent = () => {
                 grossBalance={grossBalance}
                 postTithingBalance={postTithingBalance}
                 alreadyTithed={alreadyTithed}
-                preTithe={preTithe}
+                nonTithedInvestments={nonTithedInvestments}
+                interest={interest}
+            />
+
+            <BrokerageGoalCalculatorComponent
+                currentGrossBalance={grossBalance}
+                currentPostTithingBalance={postTithingBalance}
+                defaultMonthlySavings={averageMonthlySavingsLastSixMonths}
             />
 
             <BrokerageHistoryChartComponent monthlyData={monthlyChartData} />

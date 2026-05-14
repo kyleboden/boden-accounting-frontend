@@ -349,19 +349,6 @@ const BrokerageHistoryChartComponent = ({ monthlyData }) => {
                     })()}
                 </svg>
             </div>
-
-            <div className='brokerage-chart-metrics'>
-                <div className='brokerage-chart-metric'>
-                    <div className='brokerage-chart-metric-label'>Latest month</div>
-                    <div className='brokerage-chart-metric-value'>{formatMonthLabel(latestRow?.monthKey)}</div>
-                </div>
-                {chartConfig.series.map((series) => (
-                    <div key={series.key} className='brokerage-chart-metric'>
-                        <div className='brokerage-chart-metric-label'>{series.label}</div>
-                        <div className='brokerage-chart-metric-value'>{formatCurrency(latestRow?.[series.key] ?? 0)}</div>
-                    </div>
-                ))}
-            </div>
         </div>
     )
 }

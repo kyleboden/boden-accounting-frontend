@@ -5,7 +5,8 @@ const BrokerageBalanceSummaryComponent = ({
     grossBalance,
     postTithingBalance,
     alreadyTithed,
-    preTithe
+    nonTithedInvestments,
+    interest
 }) => {
     return (
         <>
@@ -30,7 +31,8 @@ const BrokerageBalanceSummaryComponent = ({
                     {grossBalance > 0 ? (
                         <>
                             <div style={{ backgroundColor: '#00b050', width: `${(alreadyTithed / grossBalance) * 100}%`, minWidth: '1px' }} title={`Already Tithed: ${formatCurrency(alreadyTithed)}`} />
-                            <div style={{ backgroundColor: '#f0ad4e', width: `${(preTithe / grossBalance) * 100}%`, minWidth: '1px' }} title={`Pre-Tithe: ${formatCurrency(preTithe)}`} />
+                            <div style={{ backgroundColor: '#f0ad4e', width: `${(nonTithedInvestments / grossBalance) * 100}%`, minWidth: '1px' }} title={`Non-Tithed Investments: ${formatCurrency(nonTithedInvestments)}`} />
+                            <div style={{ backgroundColor: '#5bc0de', width: `${(interest / grossBalance) * 100}%`, minWidth: '1px' }} title={`Interest: ${formatCurrency(interest)}`} />
                         </>
                     ) : (
                         <div style={{ backgroundColor: '#e9ecef', width: '100%' }} />
@@ -43,7 +45,11 @@ const BrokerageBalanceSummaryComponent = ({
                     </div>
                     <div className='d-flex align-items-center'>
                         <div style={{ width: '16px', height: '12px', backgroundColor: '#f0ad4e', marginRight: '8px' }}></div>
-                        <div>Pre-Tithe: {formatCurrency(preTithe)}</div>
+                        <div>Non-Tithed Investments: {formatCurrency(nonTithedInvestments)}</div>
+                    </div>
+                    <div className='d-flex align-items-center'>
+                        <div style={{ width: '16px', height: '12px', backgroundColor: '#5bc0de', marginRight: '8px' }}></div>
+                        <div>Interest: {formatCurrency(interest)}</div>
                     </div>
                 </div>
             </div>
