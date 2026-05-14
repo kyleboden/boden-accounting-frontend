@@ -268,6 +268,19 @@ const ListBrokerageTransactionsComponent = () => {
 
         return Math.max(0, sum / latestSixMonthlyChanges.length)
     })()
+    const averageMonthlyInvestedLastSixMonths = (() => {
+        const latestSixMonthlyContributions = monthlyChartData.slice(-6)
+
+        if (latestSixMonthlyContributions.length === 0) {
+            return 0
+        }
+
+        const sum = latestSixMonthlyContributions.reduce((total, month) => (
+            total + Number(month.monthlyNetContribution ?? 0)
+        ), 0)
+
+        return Math.max(0, sum / latestSixMonthlyContributions.length)
+    })()
 
     return (
         <div className='container'>
@@ -283,6 +296,7 @@ const ListBrokerageTransactionsComponent = () => {
                 currentGrossBalance={grossBalance}
                 currentPostTithingBalance={postTithingBalance}
                 defaultMonthlySavings={averageMonthlySavingsLastSixMonths}
+                averageMonthlyInvested={averageMonthlyInvestedLastSixMonths}
             />
 
             <BrokerageHistoryChartComponent monthlyData={monthlyChartData} />

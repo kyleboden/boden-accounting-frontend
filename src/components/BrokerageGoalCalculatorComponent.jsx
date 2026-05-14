@@ -38,6 +38,7 @@ const BrokerageGoalCalculatorComponent = ({
     currentGrossBalance,
     currentPostTithingBalance,
     defaultMonthlySavings,
+    averageMonthlyInvested,
 }) => {
     const [monthlySavingsInput, setMonthlySavingsInput] = useState(null)
     const [goalInput, setGoalInput] = useState(null)
@@ -88,6 +89,12 @@ const BrokerageGoalCalculatorComponent = ({
                     />
                     <div className='form-text'>
                         Defaulted to the average monthly brokerage increase over the last 6 months.
+                    </div>
+                    <div className='small text-muted mt-2'>
+                        Avg increase (6 mo): {formatCurrency(defaultMonthlySavings)}
+                    </div>
+                    <div className='small text-muted mt-2'>
+                        Avg invested (6 mo): {formatCurrency(averageMonthlyInvested)}
                     </div>
                 </div>
 
