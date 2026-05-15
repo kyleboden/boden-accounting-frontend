@@ -6,10 +6,10 @@ const HeaderComponent = () => {
     <div>
         <header>
             <nav className='navbar navbar-dark bg-dark px-3'>
-                <Link className="navbar-brand text-white" to='/monthly-reviews'>Monthly Review Tracker</Link>
+                <Link className="navbar-brand text-white" to='/monthly-reviews'>Boden Accounting</Link>
                 <div className='ms-auto d-flex gap-3 align-items-center'>
                     <Link className='nav-link text-white px-2' to='/monthly-reviews'>Monthly Reviews</Link>
-                    <Link className='nav-link text-white px-2' to='/brokerage-transactions'>Brokerage Transactions</Link>
+                    <Link className='nav-link text-white px-2' to='/brokerage-transactions'>Brokerage</Link>
                 </div>
             </nav>
         </header>
