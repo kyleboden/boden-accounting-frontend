@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const REST_API_BASE_URL = 'http://localhost:8080/api/brokerage-transactions'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081/api'
+const REST_API_BASE_URL = `${API_BASE_URL}/brokerage-transactions`
 
 export const listBrokerageTransactions = () => axios.get(REST_API_BASE_URL)
 
@@ -11,4 +12,3 @@ export const getBrokerageTransaction = (transactionId) => axios.get(`${REST_API_
 export const updateBrokerageTransaction = (transactionId, transaction) => axios.put(`${REST_API_BASE_URL}/${transactionId}`, transaction)
 
 export const deleteBrokerageTransaction = (transactionId) => axios.delete(`${REST_API_BASE_URL}/${transactionId}`)
-
