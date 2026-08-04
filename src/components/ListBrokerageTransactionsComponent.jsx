@@ -47,7 +47,8 @@ const ListBrokerageTransactionsComponent = () => {
 
                 const simplified = items.map(item => ({
                     date: item.date,
-                    totalBrokerage: item.totalBrokerage
+                    totalBrokerage: item.totalBrokerage,
+                    investedNonTithed: item.investedNonTithed
                 }))
 
                 setBrokerageTotals(simplified)
@@ -214,10 +215,11 @@ const ListBrokerageTransactionsComponent = () => {
     const latestTotal = brokerageTotals[0]
     const latestMonthKey = latestTotal?.date ? latestTotal.date.substring(0,7) : null
     const latestIn = latestTotal ? toNumber(latestTotal.totalBrokerage ?? 0) : 0
+    const justInvested = latestTotal ? toNumber(latestTotal.investedNonTithed ?? 0) : 0
     const latestBalances = latestMonthKey ? computeBalancesUpToMonth(latestMonthKey) : { tithed: 0, invest: 0 }
-    const grossBalance = latestIn
+    const grossBalance = latestIn + justInvested
     const alreadyTithed = latestBalances.tithed
-    const nonTithedInvestments = latestBalances.invest
+    const nonTithedInvestments = latestBalances.invest + justInvested
     const interest = Math.max(0, grossBalance - alreadyTithed - nonTithedInvestments)
     const preTithe = nonTithedInvestments + interest
     const suggestedTithing = Math.ceil(Math.max(0, preTithe) * 0.1)
@@ -290,6 +292,7 @@ const ListBrokerageTransactionsComponent = () => {
                 alreadyTithed={alreadyTithed}
                 nonTithedInvestments={nonTithedInvestments}
                 interest={interest}
+                justInvested={justInvested}
             />
 
             <BrokerageGoalCalculatorComponent

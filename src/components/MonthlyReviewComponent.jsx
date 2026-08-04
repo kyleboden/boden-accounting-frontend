@@ -18,7 +18,7 @@ const MonthlyReviewComponent = () => {
     const [totalBrokerage, setTotalBrokerage] = useState(() => String(initialReview?.totalBrokerage ?? ''))
     const [tithingPaid, setTithingPaid] = useState(() => String(initialReview?.tithingPaid ?? ''))
     const [investedNonTithed, setInvestedNontithed] = useState(() => String(initialReview?.investedNonTithed ?? ''))
-    const [date, setDate] = useState(() => initialReview?.date ?? new Date().toISOString().substring(0, 10))
+    const [date, setDate] = useState(() => initialReview?.date ?? new Date(new Date().getFullYear(), new Date().getMonth(), 0).toISOString().substring(0, 10))
     const [notes, setNotes] = useState(() => initialReview?.notes ?? '')
 
     useEffect(() => {
@@ -151,10 +151,9 @@ const MonthlyReviewComponent = () => {
                                 className='form-control'
                                 value={date ? date.substring(0, 7) : new Date().toISOString().substring(0, 7)}
                                 onChange={(e) => {
-                                    // keep date as YYYY-MM-DD (set to first of month)
                                     const monthValue = e.target.value // format YYYY-MM
                                     if (monthValue) {
-                                        setDate(`${monthValue}-01`)
+                                        setDate(new Date(Number(monthValue.substring(0, 4)), Number(monthValue.substring(5, 7)), 0).toISOString().substring(0, 10))
                                     }
                                 }}
                             />

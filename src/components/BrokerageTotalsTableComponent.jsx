@@ -31,6 +31,7 @@ const BrokerageTotalsTableComponent = ({
                 <thead>
                     <tr>
                         <th>Date</th>
+                        <th>Total Contributed</th>
                         <th>Total In Brokerage</th>
                         <th>Total Tithed</th>
                         <th>Non-Tithed Investments</th>
@@ -43,6 +44,7 @@ const BrokerageTotalsTableComponent = ({
                         const totalIn = Number(totalInValue ?? 0)
                         const monthKey = total.date ? String(total.date).substring(0, 7) : null
                         const { tithed, invest } = monthKey ? computeBalancesUpToMonth(monthKey) : { tithed: 0, invest: 0 }
+                        const totalContributed = tithed + invest
                         const interest = totalIn - (tithed + invest)
                         const interestPercent = (totalIn && !Number.isNaN(totalIn)) ? (interest / totalIn) * 100 : null
 
@@ -60,6 +62,7 @@ const BrokerageTotalsTableComponent = ({
                         return (
                             <tr key={total.id}>
                                 <td>{formatDayMonthYear(displayDateIso)}</td>
+                                <td>{formatCurrency(totalContributed)}</td>
                                 <td>{formatCurrency(totalIn)} {renderDelta(totalIn, prevIn)}</td>
                                 <td>{formatCurrency(tithed)} {renderDelta(tithed, prevTithed)}</td>
                                 <td>{formatCurrency(invest)} {renderDelta(invest, prevInvest)}</td>

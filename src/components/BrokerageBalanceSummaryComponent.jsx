@@ -6,8 +6,13 @@ const BrokerageBalanceSummaryComponent = ({
     postTithingBalance,
     alreadyTithed,
     nonTithedInvestments,
-    interest
+    interest,
+    justInvested = 0
 }) => {
+    const investmentNote = justInvested > 0
+        ? <div className='small text-muted mt-1'>Includes {formatCurrency(justInvested)} just invested.</div>
+        : null
+
     return (
         <>
             <div className='row mb-3 mt-3'>
@@ -15,12 +20,14 @@ const BrokerageBalanceSummaryComponent = ({
                     <div className='card p-3'>
                         <div className='small text-muted'>Gross Balance</div>
                         <div style={{ fontSize: '2rem', fontWeight: 700 }}>{formatCurrency(grossBalance)}</div>
+                        {investmentNote}
                     </div>
                 </div>
                 <div className='col-md-6'>
                     <div className='card p-3'>
                         <div className='small text-muted'>Post-Tithing Balance</div>
                         <div style={{ fontSize: '2rem', fontWeight: 700 }}>{formatCurrency(postTithingBalance)}</div>
+                        {investmentNote}
                     </div>
                 </div>
             </div>
