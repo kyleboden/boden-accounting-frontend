@@ -96,6 +96,9 @@ const BrokerageGoalCalculatorComponent = ({
                     <div className='small text-muted mt-2'>
                         Avg invested (6 mo): {formatCurrency(averageMonthlyInvested)}
                     </div>
+                    <div className='small text-muted mt-2'>
+                        Note: this excludes the most recent investment and only includes the previous 6 months where we have final-day brokerage data.
+                    </div>
                 </div>
 
                 <div className='col-md-6'>

@@ -26,6 +26,9 @@ const BrokerageTotalsTableComponent = ({
     return (
         <>
             <h2 className='text-center'>Brokerage Totals</h2>
+            <p className='text-muted text-center'>
+                Note: this does not include the most recent investment.
+            </p>
 
             <table className='table table-striped table-bordered'>
                 <thead>
