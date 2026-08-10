@@ -34,6 +34,15 @@ const formatCurrencyInput = (value) => {
 
 const parseCurrencyInput = (value) => String(value).replace(/[^\d]/g, '')
 
+const parseCurrencyAmount = (value) => {
+    const cleaned = String(value ?? '').replace(/[^0-9.]/g, '')
+    const [dollars = '', ...decimalParts] = cleaned.split('.')
+    const cents = decimalParts.length > 0 ? decimalParts.join('').slice(0, 2) : ''
+    const normalized = cents ? `${dollars || '0'}.${cents}` : dollars
+
+    return Number(normalized)
+}
+
 const BrokerageGoalCalculatorComponent = ({
     currentGrossBalance,
     currentPostTithingBalance,
@@ -42,6 +51,7 @@ const BrokerageGoalCalculatorComponent = ({
 }) => {
     const [monthlySavingsInput, setMonthlySavingsInput] = useState(null)
     const [goalInput, setGoalInput] = useState(null)
+    const [currentBrokerageInput, setCurrentBrokerageInput] = useState('')
     const defaultMonthlySavingsDisplay = String(Math.max(0, Math.round(defaultMonthlySavings)))
     const displayedMonthlySavings = formatCurrencyInput(monthlySavingsInput ?? defaultMonthlySavingsDisplay)
     const monthlySavings = monthlySavingsInput === null
@@ -49,6 +59,19 @@ const BrokerageGoalCalculatorComponent = ({
         : (Number(monthlySavingsInput) || 0)
     const displayedGoal = formatCurrencyInput(goalInput)
     const postTitheGoal = Number(goalInput) || 0
+    const currentBrokerageValue = parseCurrencyAmount(currentBrokerageInput)
+    const hasCurrentBrokerageValue = currentBrokerageInput.trim() !== '' && Number.isFinite(currentBrokerageValue)
+    const currentBrokerageDifference = hasCurrentBrokerageValue
+        ? currentBrokerageValue - currentGrossBalance
+        : 0
+    const currentBrokeragePercent = currentGrossBalance > 0 && hasCurrentBrokerageValue
+        ? (currentBrokerageDifference / currentGrossBalance) * 100
+        : null
+    const currentBrokerageDifferenceClass = currentBrokerageDifference > 0
+        ? 'text-success'
+        : currentBrokerageDifference < 0
+            ? 'text-danger'
+            : 'text-muted'
 
     const calculation = useMemo(() => {
         const remainingPostTithe = Math.max(0, postTitheGoal - currentPostTithingBalance)
@@ -111,6 +134,39 @@ const BrokerageGoalCalculatorComponent = ({
                         onChange={(event) => setGoalInput(parseCurrencyInput(event.target.value))}
                     />
                     <div className='form-text'>This goal is treated as the post-tithe balance target.</div>
+                </div>
+            </div>
+
+            <hr />
+
+            <div className='row g-3 align-items-end'>
+                <div className='col-md-5'>
+                    <label className='form-label' htmlFor='current-brokerage-total'>Current Brokerage</label>
+                    <input
+                        id='current-brokerage-total'
+                        type='text'
+                        inputMode='decimal'
+                        className='form-control'
+                        value={currentBrokerageInput}
+                        placeholder='$0'
+                        onChange={(event) => setCurrentBrokerageInput(event.target.value)}
+                    />
+                    <div className='form-text'>Temporary comparison only. This value is not saved.</div>
+                </div>
+
+                <div className='col-md-7'>
+                    <div className='border rounded p-3 h-100'>
+                        <div className='small text-muted'>Compared To Last Month End + Last Investment</div>
+                        <div>Baseline: {formatCurrency(currentGrossBalance)}</div>
+                        <div className={currentBrokerageDifferenceClass}>
+                            {hasCurrentBrokerageValue
+                                ? `${currentBrokerageDifference >= 0 ? '+' : '-'}${formatCurrency(Math.abs(currentBrokerageDifference))}`
+                                : '-'}
+                            {currentBrokeragePercent !== null && (
+                                <span className='text-muted'> ({currentBrokerageDifference >= 0 ? '+' : '-'}{Math.abs(currentBrokeragePercent).toFixed(2)}%)</span>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
