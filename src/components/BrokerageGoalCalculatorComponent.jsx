@@ -46,6 +46,8 @@ const parseCurrencyAmount = (value) => {
 const BrokerageGoalCalculatorComponent = ({
     currentGrossBalance,
     currentPostTithingBalance,
+    alreadyTithed,
+    nonTithedInvestments,
     defaultMonthlySavings,
     averageMonthlyInvested,
 }) => {
@@ -67,6 +69,18 @@ const BrokerageGoalCalculatorComponent = ({
     const currentBrokeragePercent = currentGrossBalance > 0 && hasCurrentBrokerageValue
         ? (currentBrokerageDifference / currentGrossBalance) * 100
         : null
+    const currentBrokerageInterest = hasCurrentBrokerageValue
+        ? Math.max(0, currentBrokerageValue - alreadyTithed - nonTithedInvestments)
+        : 0
+    const currentBrokeragePreTithe = hasCurrentBrokerageValue
+        ? nonTithedInvestments + currentBrokerageInterest
+        : 0
+    const currentBrokerageSuggestedTithing = hasCurrentBrokerageValue
+        ? Math.ceil(Math.max(0, currentBrokeragePreTithe) * TITHE_RATE)
+        : 0
+    const currentBrokeragePostTithingBalance = hasCurrentBrokerageValue
+        ? currentBrokerageValue - currentBrokerageSuggestedTithing
+        : currentPostTithingBalance
     const currentBrokerageDifferenceClass = currentBrokerageDifference > 0
         ? 'text-success'
         : currentBrokerageDifference < 0
@@ -154,7 +168,7 @@ const BrokerageGoalCalculatorComponent = ({
                     <div className='form-text'>Temporary comparison only. This value is not saved.</div>
                 </div>
 
-                <div className='col-md-7'>
+                <div className='col-md-3'>
                     <div className='border rounded p-3 h-100'>
                         <div className='small text-muted'>Compared To Last Month End + Last Investment</div>
                         <div>Baseline: {formatCurrency(currentGrossBalance)}</div>
@@ -166,6 +180,19 @@ const BrokerageGoalCalculatorComponent = ({
                                 <span className='text-muted'> ({currentBrokerageDifference >= 0 ? '+' : '-'}{Math.abs(currentBrokeragePercent).toFixed(2)}%)</span>
                             )}
                         </div>
+                    </div>
+                </div>
+
+                <div className='col-md-4'>
+                    <div className='border rounded p-3 h-100'>
+                        <div className='small text-muted'>Updated Balance</div>
+                        <div>{hasCurrentBrokerageValue ? formatCurrency(currentBrokerageValue) : '-'} gross</div>
+                        <div>{hasCurrentBrokerageValue ? formatCurrency(currentBrokeragePostTithingBalance) : '-'} post tithe</div>
+                        {hasCurrentBrokerageValue && (
+                            <div className='small text-muted mt-2'>
+                                Tithe estimate: {formatCurrency(currentBrokerageSuggestedTithing)}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -298,6 +298,8 @@ const ListBrokerageTransactionsComponent = () => {
             <BrokerageGoalCalculatorComponent
                 currentGrossBalance={grossBalance}
                 currentPostTithingBalance={postTithingBalance}
+                alreadyTithed={alreadyTithed}
+                nonTithedInvestments={nonTithedInvestments}
                 defaultMonthlySavings={averageMonthlySavingsLastSixMonths}
                 averageMonthlyInvested={averageMonthlyInvestedLastSixMonths}
             />
