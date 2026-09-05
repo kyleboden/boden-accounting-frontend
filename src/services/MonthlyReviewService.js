@@ -1,14 +1,13 @@
-import axios from "axios";
+import apiClient from './apiClient.js'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081/api';
-const REST_API_BASE_URL = `${API_BASE_URL}/monthly-reviews`;
+const REST_API_BASE_URL = '/monthly-reviews'
 
-export const listMonthlyReviews = () => axios.get(REST_API_BASE_URL);
+export const listMonthlyReviews = () => apiClient.get(REST_API_BASE_URL)
 
-export const createMonthlyReview = (monthlyReview) => axios.post(REST_API_BASE_URL, monthlyReview);
+export const createMonthlyReview = (monthlyReview) => apiClient.post(REST_API_BASE_URL, monthlyReview)
 
-export const getMonthlyReview = (monthlyReviewId) => axios.get(REST_API_BASE_URL + '/' + monthlyReviewId);
+export const getMonthlyReview = (monthlyReviewId) => apiClient.get(REST_API_BASE_URL + '/' + monthlyReviewId)
 
-export const updateMonthlyReview = (monthlyReviewId, monthlyReview) => axios.put(REST_API_BASE_URL + '/' + monthlyReviewId,monthlyReview);
+export const updateMonthlyReview = (monthlyReviewId, monthlyReview) => apiClient.put(REST_API_BASE_URL + '/' + monthlyReviewId, monthlyReview)
 
-export const deleteMonthlyReview = (monthlyReviewId) => axios.delete(REST_API_BASE_URL + '/' + monthlyReviewId);
+export const deleteMonthlyReview = (monthlyReviewId) => apiClient.delete(REST_API_BASE_URL + '/' + monthlyReviewId)

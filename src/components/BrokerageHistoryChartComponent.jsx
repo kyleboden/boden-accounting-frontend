@@ -161,8 +161,6 @@ const BrokerageHistoryChartComponent = ({ monthlyData }) => {
         }
     }, [chartConfig, monthlyData])
 
-    const latestRow = monthlyData[monthlyData.length - 1] ?? null
-
     if (!monthlyData.length) {
         return (
             <div className='card p-3 mb-4'>

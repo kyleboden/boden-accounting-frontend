@@ -112,3 +112,25 @@ body {
     color: #212529;
     overflow-wrap: anywhere;
 }
+
+.auth-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #f8f9fa;
+}
+
+.auth-card {
+    width: min(100%, 420px);
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 24px;
+    background: #fff;
+}
+
+.auth-card h1 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
