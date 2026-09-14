@@ -43,6 +43,8 @@ const parseCurrencyAmount = (value) => {
     return Number(normalized)
 }
 
+const postTitheValue = (value) => Number(value ?? 0) * POST_TITHE_RATE
+
 const BrokerageGoalCalculatorComponent = ({
     currentGrossBalance,
     currentPostTithingBalance,
@@ -128,10 +130,10 @@ const BrokerageGoalCalculatorComponent = ({
                         Defaulted to the average monthly brokerage increase over the last 6 months.
                     </div>
                     <div className='small text-muted mt-2'>
-                        Avg increase (6 mo): {formatCurrency(defaultMonthlySavings)}
+                        Avg increase (6 mo): {formatCurrency(defaultMonthlySavings)} ({formatCurrency(postTitheValue(defaultMonthlySavings))} post tithe)
                     </div>
                     <div className='small text-muted mt-2'>
-                        Avg invested (6 mo): {formatCurrency(averageMonthlyInvested)}
+                        Avg invested (6 mo): {formatCurrency(averageMonthlyInvested)} ({formatCurrency(postTitheValue(averageMonthlyInvested))} post tithe)
                     </div>
                     <div className='small text-muted mt-2'>
                         Note: this excludes the most recent investment and only includes the previous 6 months where we have final-day brokerage data.
