@@ -136,7 +136,7 @@ const BrokerageGoalCalculatorComponent = ({
                         Avg invested (6 mo): {formatCurrency(averageMonthlyInvested)} ({formatCurrency(postTitheValue(averageMonthlyInvested))} post tithe)
                     </div>
                     <div className='small text-muted mt-2'>
-                        Note: this excludes the most recent investment and only includes the previous 6 months where we have final-day brokerage data.
+                        Note: invested includes the current month and most recent investment; average increase only uses finalized month-end brokerage data.
                     </div>
                 </div>
 

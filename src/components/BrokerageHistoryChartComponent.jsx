@@ -90,7 +90,7 @@ const BrokerageHistoryChartComponent = ({ monthlyData }) => {
             default:
                 return {
                     title: 'Total brokerage balance',
-                    subtitle: 'Authoritative monthly account total from reviews.',
+                    subtitle: 'Month-end review totals, plus the latest investment in the current month.',
                     type: 'line',
                     series: [
                         { key: 'totalBrokerage', label: 'Total balance', color: chartColors.totalBalance }

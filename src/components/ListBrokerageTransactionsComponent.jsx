@@ -232,7 +232,7 @@ const ListBrokerageTransactionsComponent = () => {
         if (da > db) return 1
         return 0
     })
-    const monthlyChartData = brokerageTotalsAsc.map((total, idx) => {
+    const historicalMonthlyChartData = brokerageTotalsAsc.map((total, idx) => {
         const monthKey = total.date ? String(total.date).substring(0, 7) : null
         const totalBrokerage = Number(total.totalBrokerage ?? total.totalInAccount ?? 0)
         const { tithed, invest } = monthKey ? computeBalancesUpToMonth(monthKey) : { tithed: 0, invest: 0 }
@@ -257,8 +257,38 @@ const ListBrokerageTransactionsComponent = () => {
             monthlyInterestChange: idx > 0 ? interest - previousInterest : interest
         }
     })
+    const now = new Date()
+    const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    const monthlyChartData = (() => {
+        const previous = historicalMonthlyChartData.at(-1)
+
+        if (!latestTotal || !latestMonthKey || latestMonthKey > currentMonthKey) {
+            return historicalMonthlyChartData
+        }
+
+        const monthlyValues = monthlyActivity.get(currentMonthKey) ?? {}
+        const currentMonth = {
+            monthKey: currentMonthKey,
+            totalBrokerage: grossBalance,
+            tithed: alreadyTithed,
+            nonTithed: nonTithedInvestments,
+            interest,
+            monthlyTithedNet: Number(monthlyValues.monthlyTithedNet ?? 0),
+            monthlyNonTithedNet: Number(monthlyValues.monthlyNonTithedNet ?? 0),
+            monthlyNetContribution: Number(monthlyValues.monthlyNetContribution ?? 0),
+            monthlyBalanceChange: previous ? grossBalance - previous.totalBrokerage : grossBalance,
+            monthlyInterestChange: previous ? interest - previous.interest : interest,
+            isCurrent: true
+        }
+
+        if (previous?.monthKey === currentMonthKey) {
+            return [...historicalMonthlyChartData.slice(0, -1), currentMonth]
+        }
+
+        return [...historicalMonthlyChartData, currentMonth]
+    })()
     const averageMonthlySavingsLastSixMonths = (() => {
-        const latestSixMonthlyChanges = monthlyChartData.slice(-6)
+        const latestSixMonthlyChanges = historicalMonthlyChartData.slice(-6)
 
         if (latestSixMonthlyChanges.length === 0) {
             return 0
