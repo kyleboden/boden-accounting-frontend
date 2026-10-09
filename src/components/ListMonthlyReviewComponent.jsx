@@ -3,7 +3,7 @@ import { deleteMonthlyReview, listMonthlyReviews } from '../services/MonthlyRevi
 import { useNavigate } from 'react-router-dom'
 import { formatCurrency } from '../utils/formatCurrency.js'
 
-const ListMonthlyReviewComponent = () => {
+const ListMonthlyReviewComponent = ({ onAdd, onEdit, embedded = false, showAdd = true, showTitle = true }) => {
 
     const [monthlyReviews, setMonthlyReviews] = useState([])
 
@@ -48,10 +48,18 @@ const ListMonthlyReviewComponent = () => {
     }, [])
 
     function addNewMonthlyReview(){
+        if (onAdd) {
+            onAdd()
+            return
+        }
         navigator('/add-monthly-review')
     }
 
     function updateMonthlyReviewEntry(review){
+        if (onEdit) {
+            onEdit(review)
+            return
+        }
         navigator(`/edit-monthly-review/${review.id}`, { state: { review } })
     }
 
@@ -68,10 +76,10 @@ const ListMonthlyReviewComponent = () => {
     }
 
   return (
-    <div className='container'>
+    <div className={embedded ? '' : 'container'}>
         
-        <h2 className='text-center'>Monthly Reviews</h2>
-        <button className='btn btn-primary mb-2' onClick={addNewMonthlyReview}>Add Monthly Review</button>
+        {showTitle && <h2 className='text-center'>Monthly Reviews</h2>}
+        {showAdd && <button className='btn btn-primary mb-2' onClick={addNewMonthlyReview}>Add Monthly Review</button>}
         <table className='table table-striped table-bordered'>
             <thead>
                 <tr>

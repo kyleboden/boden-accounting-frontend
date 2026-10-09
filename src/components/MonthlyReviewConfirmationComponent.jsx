@@ -3,12 +3,12 @@ import { createMonthlyReview, updateMonthlyReview } from '../services/MonthlyRev
 import { formatCurrency } from '../utils/formatCurrency.js'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-const MonthlyReviewConfirmationComponent = () => {
+const MonthlyReviewConfirmationComponent = ({ reviewId, reviewData, onBack, onSaved, embedded = false }) => {
     const { state } = useLocation()
     const navigator = useNavigate()
 
-    const id = state?.id
-    const monthlyReview = state?.monthlyReview
+    const id = reviewId ?? state?.id
+    const monthlyReview = reviewData ?? state?.monthlyReview
     const MIN_BANK_AMOUNT = 12000
 
     const calculations = useMemo(() => {
@@ -116,7 +116,8 @@ const MonthlyReviewConfirmationComponent = () => {
             : createMonthlyReview(payload)
 
         request.then(() => {
-            navigator('/monthly-reviews')
+            if (onSaved) onSaved(payload)
+            else navigator('/monthly-reviews')
         }).catch((error) => {
             console.error(error)
         })
@@ -124,6 +125,10 @@ const MonthlyReviewConfirmationComponent = () => {
 
     function backToEdit(e) {
         e.preventDefault()
+        if (onBack) {
+            onBack(id, monthlyReview)
+            return
+        }
         // Navigate back to the edit/add form and pass the draft review so the form is populated
         if (id) {
             navigator(`/edit-monthly-review/${id}`, { state: { review: monthlyReview } })
@@ -145,15 +150,15 @@ const MonthlyReviewConfirmationComponent = () => {
     }
 
     return (
-        <div className='container'>
-            <br></br>
-            <div className='row'>
-                <div className='card col-lg-10 offset-lg-1'>
-                    <div className='card-body pb-0'>
+        <div className={embedded ? '' : 'container'}>
+            {!embedded && <br />}
+            <div className={embedded ? '' : 'row'}>
+                <div className={embedded ? '' : 'card col-lg-10 offset-lg-1'}>
+                    {!embedded && <div className='card-body pb-0'>
                         <button className='btn btn-link p-0 text-decoration-none' onClick={backToEdit}>Back</button>
-                    </div>
+                    </div>}
                     {pageTitle()}
-                    <div className='card-body'>
+                    <div className={embedded ? '' : 'card-body'}>
                         <form>
                             <div className='row'>
                                 <div className='col-md-6 mb-2'>

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { getMonthlyReview } from '../services/MonthlyReviewService.js'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
-const MonthlyReviewComponent = () => {
-    const { id } = useParams()
+const MonthlyReviewComponent = ({ reviewId, initialReview: providedReview, onCancel, onConfirmation, embedded = false }) => {
+    const { id: routeId } = useParams()
+    const id = reviewId ?? routeId
     const { state } = useLocation()
-    const initialReview = state?.review && String(state.review.id) === String(id) ? state.review : null
+    const initialReview = providedReview || (state?.review && String(state.review.id) === String(id) ? state.review : null)
     const navigator = useNavigate()
     const [errors, setErrors] = useState({})
 
@@ -92,6 +93,14 @@ const MonthlyReviewComponent = () => {
             notes
         }
 
+        const reviewState = {
+            id,
+            monthlyReview
+        }
+        if (onConfirmation) {
+            onConfirmation(reviewState)
+            return
+        }
         navigator('/monthly-review-confirmation', {
             state: {
                 id,
@@ -102,6 +111,10 @@ const MonthlyReviewComponent = () => {
 
     function cancel(e) {
         e.preventDefault()
+        if (onCancel) {
+            onCancel()
+            return
+        }
         navigator('/monthly-reviews')
     }
 
@@ -134,15 +147,15 @@ const MonthlyReviewComponent = () => {
     }
 
     return (
-        <div className='container'>
-            <br></br>
-            <div className='row'>
-                <div className='card col-lg-10 offset-lg-1'>
-                    <div className='card-body pb-0'>
+        <div className={embedded ? '' : 'container'}>
+            {!embedded && <br />}
+            <div className={embedded ? '' : 'row'}>
+                <div className={embedded ? '' : 'card col-lg-10 offset-lg-1'}>
+                    {!embedded && <div className='card-body pb-0'>
                         <button className='btn btn-link p-0 text-decoration-none' onClick={cancel}>X</button>
-                    </div>
+                    </div>}
                     {pageTitle()}
-                    <div className='card-body'>
+                    <div className={embedded ? '' : 'card-body'}>
                         {/* simple month picker so user can adjust month/year without changing layout */}
                         <div className='form-group col-12 mb-3'>
                             <label className='form-label'>Month:</label>

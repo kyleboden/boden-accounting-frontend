@@ -9,10 +9,12 @@ const HeaderComponent = () => {
     <div>
         <header>
             <nav className='navbar navbar-dark bg-dark px-3'>
-                <Link className="navbar-brand text-white" to='/monthly-reviews'>Boden Accounting</Link>
+                <Link className="navbar-brand text-white" to='/'>Boden Accounting</Link>
                 <div className='ms-auto d-flex gap-3 align-items-center'>
-                    <Link className='nav-link text-white px-2' to='/monthly-reviews'>Monthly Reviews</Link>
                     <Link className='nav-link text-white px-2' to='/brokerage-transactions'>Brokerage</Link>
+                    <Link className='nav-link text-white px-2' to='/transactions'>Transactions</Link>
+                    <Link className='nav-link text-white px-2' to='/budget'>Budget</Link>
+                    <Link className='nav-link text-white px-2' to='/settings'>Settings</Link>
                     <span className='navbar-text text-white-50 d-none d-md-inline'>{user?.email}</span>
                     <button className='btn btn-outline-light btn-sm' type='button' onClick={signOut}>Sign Out</button>
                 </div>
